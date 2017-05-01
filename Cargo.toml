@@ -1,0 +1,6 @@
+[package]
+name = "shape_grammar"
+version = "0.1.0"
+authors = ["Justin Rhude <justin.rhude52@gmail.com>"]
+
+[dependencies]
