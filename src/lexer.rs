@@ -14,12 +14,13 @@ pub struct Token {
 }
 
 pub struct Lexer {
-
     buffer: VecDeque<char>,
     next_char: char,
     is_done: bool,
 }
 
+// Set the new method to create a VecDeque from the collected characters of the string.
+// Then pop the first character.
 impl Lexer{
     pub fn new(buffer: String) -> Lexer {
         let mut char_buffer = buffer.chars().collect::<VecDeque<char>>();
@@ -45,6 +46,7 @@ impl Iterator for Lexer {
         let mut token_string = String::new();
         let mut ident_type = Ident::Unknown;
 
+        // skip any whitespace from the buffer
         if self.next_char.is_whitespace() {
             while self.next_char.is_whitespace() {
                 if let Some(x) = self.buffer.pop_front() {
@@ -55,7 +57,9 @@ impl Iterator for Lexer {
             }
         }
 
+        // check for alphabetic char
         if self.next_char.is_alphabetic() {
+            // if so then add the char to the token
             token_string.push(self.next_char);
             if let Some(x) = self.buffer.pop_front() {
                 self.next_char = x;
@@ -64,6 +68,7 @@ impl Iterator for Lexer {
                 self.next_char = ' ';
             }
 
+            // add any consecutive letters or numbers to the token
             while self.next_char.is_alphanumeric() {
                 token_string.push(self.next_char);
                 if let Some(x) = self.buffer.pop_front() {
@@ -73,6 +78,8 @@ impl Iterator for Lexer {
                     break;
                 }
             }
+
+            // determine which identifier the token is
             match token_string.as_ref() {
                 "polygon"  => ident_type = Ident::Polygon,
                 "extrude"  => ident_type = Ident::Extrude,
@@ -83,7 +90,9 @@ impl Iterator for Lexer {
             }
         }
 
+        // check for a number
         else if self.next_char.is_numeric() {
+            // if so then add it to the token
             token_string.push(self.next_char);
             if let Some(x) = self.buffer.pop_front() {
                 self.next_char = x;
@@ -92,6 +101,7 @@ impl Iterator for Lexer {
                 self.next_char = ' ';
             }
 
+            // any consecutive numbers are added to the token
             while self.next_char.is_numeric(){
                 token_string.push(self.next_char);
                 if let Some(x) = self.buffer.pop_front() {
@@ -101,10 +111,14 @@ impl Iterator for Lexer {
                     break;
                 }
             }
+
+            // set identifier type to literal integer
             ident_type = Ident::IntLit;
         }
 
+        // if not letter or number it is a symbol
         else {
+            // add it to the token
             token_string.push(self.next_char);
             if let Some(x) = self.buffer.pop_front() {
                 self.next_char = x;
@@ -113,6 +127,7 @@ impl Iterator for Lexer {
                 self.next_char = ' ';
             }
 
+            // determine which symbol it is
             match token_string.as_ref() {
                 "=" => ident_type = Ident::OpAssign,
                 "+" => ident_type = Ident::OpPlus,
@@ -126,6 +141,7 @@ impl Iterator for Lexer {
 
         }
 
+        // return the lexized token (idk if thats an actual word but im using it anyways)
         Some(Token {identifier: token_string, ident_type: ident_type})
     }
 
