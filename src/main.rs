@@ -4,6 +4,7 @@ use std::io::prelude::*;
 use std::path::Path;
 
 mod lexer;
+mod parser;
 use lexer::Ident;
 use lexer::Token;
 
@@ -31,15 +32,9 @@ fn main() {
 
     } // file goes out of scope, and gets closed
 
-    let mut lex = lexer::Lexer::new(buffer);
+    //let mut lex = lexer::Lexer::new(buffer);
+    let mut parser = parser::Parser::new(buffer);
 
-    // loop through the buffer until all the tokens have been consumed
-    loop {
-        let token = match lex.next(){
-            None => {println!("End of file"); break;},
-            Some(value) => value,
-        };
+    parser.parse();
 
-        println!("{}", token.identifier );
-    }
 }
